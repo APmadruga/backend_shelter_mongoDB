@@ -1,7 +1,6 @@
 package com.pet.manager.crontroller;
-
-
 import com.pet.manager.crontroller.request.PetRQ;
+import com.pet.manager.model.Feed;
 import com.pet.manager.model.Pet;
 import com.pet.manager.service.PetService;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,7 @@ public class PetController {
         return petService.getPetByName(petName);
     }
 
-    @PutMapping("/pet/{id}")
+    @PutMapping("/pet-update/{id}")
     public ResponseEntity updatePetById(@PathVariable(value = "id") String petId, @RequestBody PetRQ petRQ){
         petService.updatedPetById(petId, petRQ);
         return ResponseEntity.created(URI.create("/pet/"+ petId)).body("Updated");
@@ -39,19 +38,14 @@ public class PetController {
         return petService.getPets();
     }
 
+    @GetMapping("/pet/{id}/feeds")
+    public List<Feed> getFeedsFromPet(@PathVariable(value = "id") String petId){
+        return petService.getFeedsById(petId);
+    }
+
     @GetMapping("/pets/{type}")
     public List<Pet> getPetsByType(@PathVariable(value = "type") String type) {
-        // -> Not unique index on type attribute which is not unique
-        // -> Create A unique index on the Name field
-        // -> CommandLineRunnerBean
-        // -> Map the exception of having multiple names to a 409(CONFLICT statusCode)
-
         return petService.getPetsByType(type);
-    /*   try {
-           insert
-       } catch(IndexViolationException e){
-           throw new DuplicatedPetException() -> Exception handler to 409
-       }*/
     }
 
     @PostMapping("/pet")
@@ -60,7 +54,7 @@ public class PetController {
     }
 
 
-    @DeleteMapping("/pet/{id}")
+    @DeleteMapping("/pet-delete/{id}")
     public ResponseEntity deletePetById(@PathVariable(value = "id")  String id){
         petService.deletePetById(id);
         return ResponseEntity.created(URI.create("/pet")).body("Deleted");

@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document
 @Builder
 @ToString
@@ -19,4 +21,5 @@ public class Pet {
     private String firstName;
     @Indexed(unique = false)
     private PetType petType;
+    private List<Feed> feedKG;
 }

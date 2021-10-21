@@ -1,21 +1,18 @@
 package com.pet.manager.service;
 
 import com.pet.manager.crontroller.request.PetRQ;
-import com.pet.manager.crontroller.response.PetRS;
 import com.pet.manager.exception.DuplicatePetException;
 import com.pet.manager.exception.ResourceNotFound;
+import com.pet.manager.model.Feed;
 import com.pet.manager.model.Pet;
 import com.pet.manager.model.PetType;
 import com.pet.manager.repository.PetRepository;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.PermissionDeniedDataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PetService {
@@ -38,6 +35,7 @@ public class PetService {
                     .builder()
                     .firstName(petRQ.getFirstName())
                     .age(petRQ.getAge())
+                            .feedKG(petRQ.getFeed())
                             .petType(petRQ.getPetType()).build());
         } catch (DuplicateKeyException e) {
             throw new DuplicatePetException();
@@ -85,6 +83,7 @@ public class PetService {
         PetType petType = petRQ.getPetType();
         Pet pet = petRepository.findById(petId).get();
         pet.setFirstName(firstName);
+        pet.setFeedKG(petRQ.getFeed());
         pet.setPetType(petType);
         pet.setAge(age);
         return petRepository.save(pet);
@@ -99,9 +98,15 @@ public class PetService {
             throw new ResourceNotFound("Such Pet Type Does not Exist");
         }
         return petRepository.findPetByPetType(PetType.valueOf(type));
-        //List<Pet> allPets = petRepository.findAll();
-
-        //return allPets.stream().filter(x -> x.getPetType().toString() == type).collect(Collectors.toList());
     }
 
+    public List<Feed> getFeedsById(String petId) {
+        List<Feed> feedList = new ArrayList<Feed>();
+        try {
+            Pet pet = petRepository.findById(petId).get();
+            return pet.getFeedKG();
+        } catch (ResourceNotFound e) {
+            throw new ResourceNotFound("Can't find pet");
+        }
+    }
 }
